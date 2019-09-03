@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import os
 import datetime
 
@@ -9,7 +11,7 @@ def checkIf(strLine, valueType):
     exec(valueType + '(row[i])')
     return valueType                    
 
-naList = ['NA', 'NULL', '-', '', '.', 'НД']
+naList = ['NA', 'NULL', '-', '', '.']
 
 for filename in os.listdir('./raw/'):
     file = open('./raw/' + filename, 'r')
