@@ -4,6 +4,11 @@ import os
 
 varSet = set()
 
+if 'y' in input('trimmed?'):
+    suffix = 'T'
+else:
+    suffix = ''
+
 def writeHeader(outputVCF, callerName, line):
     if callerName == 'Mutect2':
         specificHeaderPart = 'GT:AD:FREQ:DP'
@@ -51,13 +56,13 @@ def main():
                              + '\t' + '.')
             elif ('##source=Mutect2' in line):
                 callerName = 'Mutect2'
-                suffix = 'M'
+                suffix += 'M'
             elif ('##source=VarScan2' in line):
                 callerName = 'VarScan2'
-                suffix = 'V'
+                suffix += 'V'
             elif ('##source=Pisces' in line):
                 callerName = 'Pisces'
-                suffix = 'TP'
+                suffix += 'P'
             line = singleVCF.readline()
         singleVCF.close()
 

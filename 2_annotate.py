@@ -100,8 +100,8 @@ def createDataBase(VCF, VEP, VAI):
     for index, row in VAI.iterrows():
         for info in infoVAI:
             if info in row['Extra']:
-                dataBase\
-                    .loc[dataBase['IDENT'] == VAI.loc[index, 'Uploaded Variation'], info] = \
+                dataBase.loc[dataBase['IDENT'] == \
+                             VAI.loc[index, 'Uploaded Variation'], info] = \
                     row['Extra'].split(info + '=')[1].split(';')[0]
 
     return dataBase
