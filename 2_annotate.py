@@ -3,15 +3,16 @@
 from Bio import Entrez
 import pandas as pd
 import requests, sys
+import datetime
 
 mutDF = dict()
 patients = set()
 SNPIDs = list()
 
 suffix = 'TP'
-VEPfile='VEP.' + suffix + '.vcf'
-VCFfile='allVCF.' + suffix + '.vcf'
-VAIfile='fromVAI.' + suffix + '.txt'
+VEPfile='VEP_results/VEP.' + suffix + '.vcf'
+VCFfile='population_VCF/allVCF.' + suffix + '.vcf'
+VAIfile='VAI_results/fromVAI.' + suffix + '.txt'
 
 def fromVEP(VEPfile=VEPfile,
             output='tableVEP.txt'):
@@ -182,6 +183,8 @@ for index, row in dataBase.iterrows():
             dataBase.loc[index, 'tier'] = '3'
     else:
         dataBase.loc[index, 'tier'] = '3'
-writer = pd.ExcelWriter('./results/tiers.xlsx')
-dataBase.to_excel(writer, 'tiers')
+writer = pd.ExcelWriter('./results/' \
+                        + datetime.datetime.now().strftime("%Y_%m_%d") \
+                        + '.' + suffix + '.xlsx')
+dataBase.to_excel(writer, suffix)
 writer.save()
