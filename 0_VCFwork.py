@@ -39,6 +39,7 @@ def getString(callerName, line, patient):
 
 def main():
     global suffix
+    callerDefined = False
     firstHeaderFlag = True
     for f in os.listdir('./raw'):
         singleVCF = open('./raw/' + f, 'r')
@@ -55,15 +56,19 @@ def main():
                     outputVCF.write(string)
                     varSet.add('\t'.join(string.split('\t')[1:6]) \
                              + '\t' + '.')
-            elif ('##source=Mutect2' in line):
-                callerName = 'Mutect2'
-                suffix += 'M'
-            elif ('##source=VarScan2' in line):
-                callerName = 'VarScan2'
-                suffix += 'V'
-            elif ('##source=Pisces' in line):
-                callerName = 'Pisces'
-                suffix += 'P'
+            elif not callerDefined:
+                if ('##source=Mutect2' in line):
+                    callerName = 'Mutect2'
+                    suffix += 'M'
+                    callerDefined = True
+                elif ('##source=VarScan2' in line):
+                    callerName = 'VarScan2'
+                    suffix += 'V'
+                    callerDefined = True
+                elif ('##source=Pisces' in line):
+                    callerName = 'Pisces'
+                    suffix += 'P'
+                    callerDefined = True
             line = singleVCF.readline()
         singleVCF.close()
 
