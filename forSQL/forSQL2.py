@@ -15,7 +15,7 @@ naList = ['NA', 'NULL', '-', '', '.']
 
 for filename in os.listdir('./raw/'):
     file = open('./raw/' + filename, 'r')
-    output = open('sql_' + filename, 'w')
+    output = open('./results/sql_' + filename, 'w')
     line = 'insert into t' + filename.split('.')[0].capitalize() + '('
     line += '\t' + ',\t'.join(file.readline()[:-1].split('\t')) + ') values\n'
     output.write(line)
