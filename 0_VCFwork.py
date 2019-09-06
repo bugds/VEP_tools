@@ -48,7 +48,7 @@ def main():
         while line:
             if not ('##' in line):
                 if ('#CHROM' in line) and firstHeaderFlag:
-                    outputVCF = open('allVCF.' + suffix + '.vcf', 'w')
+                    outputVCF = open('population_VCF/allVCF.' + suffix + '.vcf', 'w')
                     writeHeader(outputVCF, callerName, line)
                     firstHeaderFlag = False
                 elif not ('#CHROM' in line):
@@ -73,7 +73,7 @@ def main():
         singleVCF.close()
 
     outputVCF.close()
-    fileForVEP = open('forVEP.' + suffix + '.vcf', 'w')
+    fileForVEP = open('VEP_results/forVEP.' + suffix + '.vcf', 'w')
     for item in varSet:
         fileForVEP.write(item + '\n')
     fileForVEP.close()

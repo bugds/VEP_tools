@@ -9,7 +9,7 @@ patients = set()
 SNPIDs = list()
 
 suffix = 'TP'
-VEPfile='1_VEP.' + suffix + '.vcf'
+VEPfile='VEP.' + suffix + '.vcf'
 VCFfile='allVCF.' + suffix + '.vcf'
 VAIfile='fromVAI.' + suffix + '.txt'
 
@@ -81,7 +81,8 @@ def createDataBase(VCF, VEP, VAI):
                         VCF[['IDENT',
                              'PATIENT', # Probe ID
                              'FREQ', # Alt reads fraction
-                             'DP' # Read depth
+                             'DP', # Read depth
+                             'FILTER' # VCF filter
                            ]],
                         on = 'IDENT', sort = 'False')
                         # right_index=True, left_index=True, sort='False') # r-g
