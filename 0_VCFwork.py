@@ -38,6 +38,7 @@ def getString(callerName, line, patient):
          + specificVariantPart + '\t' + patient + '\n'
 
 def main():
+    global suffix
     firstHeaderFlag = True
     for f in os.listdir('./raw'):
         singleVCF = open('./raw/' + f, 'r')
