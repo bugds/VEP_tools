@@ -4,12 +4,13 @@ from Bio import Entrez
 import pandas as pd
 import requests, sys
 import datetime
+import os
 
 mutDF = dict()
 patients = set()
 SNPIDs = list()
 
-suffix = 'TP'
+suffix = 'V'
 VEPfile='VEP_results/VEP.' + suffix + '.vcf'
 VCFfile='population_VCF/allVCF.' + suffix + '.vcf'
 VAIfile='VAI_results/fromVAI.' + suffix + '.txt'
@@ -152,6 +153,7 @@ def checkMinorAF():
 fromVEP()
 VCF = parseInput(VCFfile)
 VEP = parseInput('tableVEP.txt')
+os.remove('tableVEP.txt')
 VAI = parseInput(VAIfile, VAI=True)
 dataBase = createDataBase(VCF,VEP,VAI)
 dataBase['tier'] = ''
