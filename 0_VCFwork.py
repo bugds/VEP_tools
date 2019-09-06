@@ -59,7 +59,7 @@ def main():
             elif not callerDefined:
                 if ('##source=Mutect2' in line):
                     callerName = 'Mutect2'
-                    suffix += 'M'
+                    suffix += 'G'
                     callerDefined = True
                 elif ('##source=VarScan2' in line):
                     callerName = 'VarScan2'
