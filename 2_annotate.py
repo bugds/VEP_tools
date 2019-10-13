@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 
-from Bio import Entrez
 import pandas as pd
-import requests, sys
+import sys
 import datetime
 import os
 
@@ -10,7 +9,7 @@ mutDF = dict()
 patients = set()
 SNPIDs = list()
 
-suffix = 'V'
+suffix = 'TP'
 VEPfile='VEP_results/VEP.' + suffix + '.vcf'
 VCFfile='population_VCF/allVCF.' + suffix + '.vcf'
 VAIfile='VAI_results/fromVAI.' + suffix + '.txt'
@@ -77,8 +76,9 @@ def createDataBase(VCF, VEP, VAI):
                              'Consequence', # Biological consequence
                              'SYMBOL', # Gene
                              'Existing_variation', # Known identificators
-                             'LoFtool', # Splicing predictor 1
-                             'MaxEntScan_diff' # Splicing predictor 2
+                             'MaxEntScan_diff', # Splicing predictor 2
+                             'SIFT',
+                             'PolyPhen'
                            ]],
                         VCF[['IDENT',
                              'PATIENT', # Probe ID
@@ -88,6 +88,9 @@ def createDataBase(VCF, VEP, VAI):
                            ]],
                         on = 'IDENT', sort = 'False')
                         # right_index=True, left_index=True, sort='False') # r-g
+    
+    dataBase = \
+        dataBase.rename(columns={'SIFT': 'SIFT_VEP', 'PolyPhen': 'PolyPhen_VEP'})
     
     infoVAI = ['VEST',
                'SIFT',
@@ -117,18 +120,19 @@ def reindexWithSamples(dataBase):
 
 def isPolymorphism(af, eur_af, gnomad):
     b = False
+    percentage = 0.01
     try:
-        if float(af) > 0.05:
+        if float(af) > percentage:
             b = True
     except ValueError:
         pass
     try:
-        if float(eur_af) > 0.05:
+        if float(eur_af) > percentage:
             b = True
     except ValueError:
         pass
     try:
-        if float(gnomad) > 0.05:
+        if float(gnomad) > percentage:
             b = True
     except ValueError:
         pass
@@ -153,7 +157,7 @@ def checkMinorAF():
 fromVEP()
 VCF = parseInput(VCFfile)
 VEP = parseInput('tableVEP.txt')
-os.remove('tableVEP.txt')
+#os.remove('tableVEP.txt')
 VAI = parseInput(VAIfile, VAI=True)
 dataBase = createDataBase(VCF,VEP,VAI)
 dataBase['tier'] = ''
@@ -174,15 +178,10 @@ for index, row in dataBase.iterrows():
       or ('D' in row['MUTTASTER']) \
       or ('D' in row['LRT']) \
       or ('H' in row['MUTASSESSOR']) \
-      or ('M' in row['MUTASSESSOR']):
+      or ('M' in row['MUTASSESSOR']) \
+      or ('damag' in row['PolyPhen_VEP']) \
+      or ('delet' in row['SIFT_VEP']):
         dataBase.loc[index, 'tier'] = '2'
-    elif (row['LoFtool'] != ''):
-        try: float(row['LoFtool'])
-        except: print(row['LoFtool'])
-        if float(row['LoFtool']) < 0.5:
-            dataBase.loc[index, 'tier'] = '2'
-        else:
-            dataBase.loc[index, 'tier'] = '3'
     else:
         dataBase.loc[index, 'tier'] = '3'
 writer = pd.ExcelWriter('./results/' \

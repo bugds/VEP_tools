@@ -1,5 +1,5 @@
 ## ENSEMBL VARIANT EFFECT PREDICTOR format (UCSC Variant Annotation Integrator)
-## Output produced at 2019-09-06 03:34:00
+## Output produced at 2019-09-17 13:47:22
 ## Connected to UCSC database hg38
 ## Variants: User Supplied Track
 ## Transcripts: GENCODE v29 Comprehensive Transcript Set (only Basic displayed by default) (hg38.knownGene)
