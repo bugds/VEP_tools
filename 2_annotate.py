@@ -5,16 +5,7 @@ import sys
 import datetime
 import os
 
-mutDF = dict()
-patients = set()
-SNPIDs = list()
-
-suffix = 'TV'
-VEPfile='VEP_results/VEP.' + suffix + '.vcf'
-VCFfile='population_VCF/allVCF.' + suffix + '.vcf'
-VAIfile='VAI_results/fromVAI.' + suffix + '.txt'
-
-def fromVEP(VEPfile=VEPfile,
+def fromVEP(VEPfile,
             output='tableVEP.txt'):
     '''Reformation of VEP output
     '''
@@ -137,7 +128,7 @@ def isPolymorphism(af, eur_af, gnomad):
     except ValueError:
         pass
     return b
-
+'''
 def checkMinorAF():
     global SNPIDs
     global l2
@@ -153,39 +144,65 @@ def checkMinorAF():
             if float(SNPStr.split('=')[1].split('/')[0]) > 0.05:
                 minorAFCandidates.append(rs)
     return minorAFCandidates
+'''
+def main(suffix):
+    mutDF = dict()
+    patients = set()
+    SNPIDs = list()
 
-fromVEP()
-VCF = parseInput(VCFfile)
-VEP = parseInput('tableVEP.txt')
-#os.remove('tableVEP.txt')
-VAI = parseInput(VAIfile, VAI=True)
-dataBase = createDataBase(VCF,VEP,VAI)
-dataBase['tier'] = ''
-reindexWithSamples(dataBase)
-for index, row in dataBase.iterrows():
-    if isPolymorphism(row['AF'], row['EUR_AF'], row['gnomAD_AF']):
-        dataBase.loc[index, 'tier'] = '5' 
-    elif ('pathogen' in row['CLIN_SIG']) \
-      or ('A' in row['MUTTASTER']):
-        dataBase.loc[index, 'tier'] = '1'
-    elif ('benign' in row['CLIN_SIG']) \
-      or ('synon' in row['Consequence']) \
-	  or ('P' in row['MUTTASTER']):
-        dataBase.loc[index, 'tier'] = '4'
-    elif ('D' in row['SIFT']) \
-      or ('D' in row['PP2HVAR']) \
-      or ('D' in row['PP2HDIV']) \
-      or ('D' in row['MUTTASTER']) \
-      or ('D' in row['LRT']) \
-      or ('H' in row['MUTASSESSOR']) \
-      or ('M' in row['MUTASSESSOR']) \
-      or ('damag' in row['PolyPhen_VEP']) \
-      or ('delet' in row['SIFT_VEP']):
-        dataBase.loc[index, 'tier'] = '2'
-    else:
-        dataBase.loc[index, 'tier'] = '3'
-writer = pd.ExcelWriter('./results/' \
-                        + datetime.datetime.now().strftime("%Y_%m_%d") \
-                        + '.' + suffix + '.xlsx')
-dataBase.to_excel(writer, suffix)
-writer.save()
+    VEPfile='VEP_results/VEP.' + suffix + '.vcf'
+    VCFfile='population_VCF/allVCF.' + suffix + '.vcf'
+    VAIfile='VAI_results/fromVAI.' + suffix + '.txt'
+
+    fromVEP(VEPfile)
+    VCF = parseInput(VCFfile)
+    VEP = parseInput('tableVEP.txt')
+    #os.remove('tableVEP.txt')
+    VAI = parseInput(VAIfile, VAI=True)
+    dataBase = createDataBase(VCF,VEP,VAI)
+    dataBase['tier'] = ''
+    reindexWithSamples(dataBase)
+    for index, row in dataBase.iterrows():
+        if isPolymorphism(row['AF'], row['EUR_AF'], row['gnomAD_AF']):
+            dataBase.loc[index, 'tier'] = '5' 
+        elif ('pathogenic' in row['CLIN_SIG'].split('&')) \
+        or ('A' in row['MUTTASTER']):
+            dataBase.loc[index, 'tier'] = '1'
+        elif ('benign' in row['CLIN_SIG'].split('&')) \
+        or ('synon' in row['Consequence']) \
+        or ('P' in row['MUTTASTER']):
+            dataBase.loc[index, 'tier'] = '4'
+        elif ('D' in row['SIFT']) \
+        or ('D' in row['PP2HVAR']) \
+        or ('P' in row['PP2HVAR']) \
+        or ('D' in row['PP2HDIV']) \
+        or ('P' in row['PP2HDIV']) \
+        or ('D' in row['MUTTASTER']) \
+        or ('D' in row['LRT']) \
+        or ('H' in row['MUTASSESSOR']) \
+        or ('M' in row['MUTASSESSOR']) \
+        or ('damag' in row['PolyPhen_VEP']) \
+        or ('delet' in row['SIFT_VEP']):
+            if ('T' in row['SIFT']) \
+            or ('B' in row['PP2HVAR']) \
+            or ('B' in row['PP2HDIV']) \
+            or ('N' in row['MUTTASTER']) \
+            or ('N' in row['LRT']) \
+            or ('L' in row['MUTASSESSOR']) \
+            or ('N' in row['MUTASSESSOR']) \
+            or ('benig' in row['PolyPhen_VEP']) \
+            or ('toler' in row['SIFT_VEP']):     # Check for conflicting predictions
+                dataBase.loc[index, 'tier'] = '2/4'
+            else:   # No conflicting predictions
+                dataBase.loc[index, 'tier'] = '2'
+        else:
+            dataBase.loc[index, 'tier'] = '3'
+    writer = pd.ExcelWriter('./results/' \
+                            + datetime.datetime.now().strftime("%Y_%m_%d") \
+                            + '.' + suffix + '.xlsx')
+    dataBase.to_excel(writer, suffix)
+    writer.save()
+
+suffixes = ['G', 'TG', 'P', 'TP']
+for s in suffixes:
+    main(s)
