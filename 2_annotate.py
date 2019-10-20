@@ -9,7 +9,7 @@ mutDF = dict()
 patients = set()
 SNPIDs = list()
 
-suffix = 'TP'
+suffix = 'TV'
 VEPfile='VEP_results/VEP.' + suffix + '.vcf'
 VCFfile='population_VCF/allVCF.' + suffix + '.vcf'
 VAIfile='VAI_results/fromVAI.' + suffix + '.txt'

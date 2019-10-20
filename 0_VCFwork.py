@@ -28,10 +28,12 @@ def writeHeader(outputVCF, callerName, line):
 def getString(callerName, line, patient):
     if callerName == 'Mutect2':
         specificVariantPart = '\t'.join(line.split('\t')[9]\
-                                            .split(':')[0:4])[:-1]
+                                            .split(':')[0:4])\
+                                            .replace('\n', '')
     else:
         specificVariantPart = '\t'.join(line.split('\t')[9]\
-                                            .split(':'))[:-1]
+                                            .split(':'))\
+                                            .replace('\n', '')
     return '_'.join(line.split('\t')[0:2]) + '_' \
          + '/'.join(line.split('\t')[3:5]) + '\t' \
          + '\t'.join(line.split('\t')[0:7]) + '\t' \
