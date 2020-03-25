@@ -3,6 +3,10 @@
 import os
 import datetime
 
+minVarCharLength = 50
+naValue = '.'
+ifUnknown = 'varchar({})'.format(minVarCharLength)
+
 def valiDate(date_text):
     datetime.datetime.strptime(date_text, '%d.%m.%Y')
     return 'date'
@@ -59,7 +63,8 @@ for filename in os.listdir('./raw/'):
                 length = int(typesArray[i].split('(')[1].split(')')[0])
                 typesArray[i] = 'varchar({})'.format(max(length, len(row[i])))
         line = file.readline()[:-1]
-    output.write('\t' + '\t'.join(['varchar(3)' if t == 'date' else t for t in typesArray]) + '\n')
+    toWrite = '\t' + '\t'.join(['varchar(3)' if t == 'date' else t for t in typesArray]) + '\n'
+    output.write(toWrite.replace('unknown', ifUnknown))
     file.close()
     file = open('./raw/' + filename, 'r')
     line = file.readline()
@@ -72,10 +77,10 @@ for filename in os.listdir('./raw/'):
         row = line.split('\t')
         toWrite = '(\t'
         if len(row) < len(typesArray):
-            row.extend(['NULL']*(len(typesArray) - len(row)))
+            row.extend([naValue]*(len(typesArray) - len(row)))
         for i in range(len(typesArray)):
             if row[i] in naList:
-                toWrite += 'NULL,\t'
+                toWrite += naValue + ',\t'
             elif (typesArray[i] == 'int') or (typesArray[i] == 'float'):
                 toWrite += row[i].replace('%', '').replace(',', '.') + ',\t'
             elif typesArray[i] == 'date':
